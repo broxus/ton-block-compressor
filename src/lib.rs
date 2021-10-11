@@ -9,6 +9,7 @@ pub struct ZstdWrapper {
 }
 
 impl ZstdWrapper {
+    /// constructs zstd compressor with 3 compression level. 2 ms compression in worst case
     pub fn new() -> Self {
         Self::with_level(zstd::DEFAULT_COMPRESSION_LEVEL)
     }
@@ -34,19 +35,14 @@ impl ZstdWrapper {
         let out_pos = output_wrapper.position() as usize;
         Ok(&self.buffer[0..out_pos])
     }
-    // pub fn compress(&mut self, bytes: &[u8]) -> Result<Vec<u8>> {
-    //     let mut wrapper = io::Cursor::new(bytes);
-    //
-    //     let mut buffer = Vec::with_capacity(1024 * 1024);
-    //     let mut output_wrapper = io::Cursor::new(&mut buffer);
-    //     // let mut output_wrapper = io::Cursor::new(&mut self.buffer);
-    //     let mut encoder =
-    //         zstd::stream::Encoder::with_prepared_dictionary(&mut output_wrapper, &self.c_dict)?;
-    //     io::copy(&mut wrapper, &mut encoder)?;
-    //     encoder.finish()?;
-    //     // Ok(&self.buffer[0..out_pos])
-    //     Ok(buffer)
-    // }
+
+    pub fn compress_owned(&mut self, bytes: &[u8]) -> Result<Vec<u8>> {
+        self.compress(bytes).map(|x| x.to_vec())
+    }
+
+    pub fn decompress_owned(&mut self, bytes: &[u8]) -> Result<Vec<u8>> {
+        self.decompress(bytes).map(|x| x.to_vec())
+    }
 
     pub fn decompress(&mut self, bytes: &[u8]) -> Result<&[u8]> {
         self.buffer.truncate(0);
@@ -93,6 +89,28 @@ mod test {
         let mut expected = vec![0; 1024 * 10];
         rand::thread_rng().fill(expected.as_mut_slice());
 
+        let res = encoder.compress(&expected).unwrap().to_vec();
+        println!("Len: {}", res.len());
+
+        let got = encoder.decompress(&res).unwrap();
+
+        assert_eq!(expected, got);
+    }
+
+    #[test]
+    fn test_multiple() {
+        let mut encoder = ZstdWrapper::new();
+        let mut expected = vec![0; 1024 * 1024 * 8];
+        rand::thread_rng().fill(expected.as_mut_slice());
+
+        let res = encoder.compress(&expected).unwrap().to_vec();
+        println!("Len: {}", res.len());
+
+        let got = encoder.decompress(&res).unwrap();
+
+        assert_eq!(expected, got);
+
+        rand::thread_rng().fill(expected.as_mut_slice());
         let res = encoder.compress(&expected).unwrap().to_vec();
         println!("Len: {}", res.len());
 
