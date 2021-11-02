@@ -15,8 +15,8 @@ impl ZstdWrapper {
     }
 
     pub fn with_level(level: i32) -> Self {
-        let d_dict = zstd::dict::DecoderDictionary::copy(include_bytes!("../dictionary"));
-        let c_dict = zstd::dict::EncoderDictionary::copy(include_bytes!("../dictionary"), level);
+        let d_dict = zstd::dict::DecoderDictionary::copy(include_bytes!("../Dict.data"));
+        let c_dict = zstd::dict::EncoderDictionary::copy(include_bytes!("../Dict.data"), level);
         Self {
             c_dict,
             d_dict,
@@ -94,7 +94,7 @@ mod test {
         let mut encoder = ZstdWrapper::new();
         let input = b"asasaasasasasasasasasasaaaaaaaaaaaaasassas";
         let res = encoder.compress(&input[..]).unwrap();
-        let mut de = Decoder::with_dictionary(&res[..], include_bytes!("../dictionary")).unwrap();
+        let mut de = Decoder::with_dictionary(&res[..], include_bytes!("../Dict.data")).unwrap();
         let mut out = vec![];
         de.read_to_end(&mut out).unwrap();
         assert_eq!(&out, input);
@@ -141,7 +141,7 @@ mod test {
         let encoder = ZstdWrapper::new();
         let input = b"asasaasasasasasasasasasaaaaaaaaaaaaasassas";
         let res = encoder.compress_owned(&input[..]).unwrap();
-        let mut de = Decoder::with_dictionary(&res[..], include_bytes!("../dictionary")).unwrap();
+        let mut de = Decoder::with_dictionary(&res[..], include_bytes!("../Dict.data")).unwrap();
         let mut out = vec![];
         de.read_to_end(&mut out).unwrap();
         assert_eq!(&out, input);
