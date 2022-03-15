@@ -94,7 +94,7 @@ mod test {
         let mut encoder = ZstdWrapper::new();
         let input = b"asasaasasasasasasasasasaaaaaaaaaaaaasassas";
         let res = encoder.compress(&input[..]).unwrap();
-        let mut de = Decoder::with_dictionary(&res[..], include_bytes!("../Dict.data")).unwrap();
+        let mut de = Decoder::with_dictionary(res, include_bytes!("../Dict.data")).unwrap();
         let mut out = vec![];
         de.read_to_end(&mut out).unwrap();
         assert_eq!(&out, input);

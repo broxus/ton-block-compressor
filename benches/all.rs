@@ -2,13 +2,13 @@ use std::time::Duration;
 use std::{fs::File, os::raw::c_int, path::Path};
 
 use criterion::profiler::Profiler;
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use criterion::{criterion_group, criterion_main, Criterion};
 use pprof::ProfilerGuard;
 use rand::Rng;
 
 use ton_block_compressor::ZstdWrapper;
 
-fn bench_encode_8mb(mut c: &mut Criterion) {
+fn bench_encode_8mb(c: &mut Criterion) {
     let mut input = vec![8; 1024 * 1024 * 8];
     let mut encoder = ZstdWrapper::new();
     c.bench_function("Encode optimistic", |b| {
@@ -46,7 +46,7 @@ fn bench_encode_8mb(mut c: &mut Criterion) {
     });
 }
 
-fn bench_encode_1mb(mut c: &mut Criterion) {
+fn bench_encode_1mb(c: &mut Criterion) {
     let mut input = vec![8; 1024 * 1024];
     let mut encoder = ZstdWrapper::new();
     c.bench_function("Encode optimistic 1mb", |b| {
