@@ -69,7 +69,6 @@ impl ZstdWrapper {
         io::copy(&mut decoder, &mut output_wrapper)?;
 
         let out_pos = output_wrapper.position() as usize;
-        drop(output_wrapper);
         Ok(&self.buffer[0..out_pos])
     }
 }
